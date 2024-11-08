@@ -1,3 +1,4 @@
+
 # Project Name
 
 Brief description of the project and its purpose.
@@ -9,6 +10,7 @@ Brief description of the project and its purpose.
 - [Installation](#installation)
 - [Usage](#usage)
 - [Migrations](#migrations)
+- [Password Hashing](#password-hashing)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -76,6 +78,14 @@ When making changes to the database schema:
    ```bash
    docker-compose exec app npx ts-node seed.ts
    ```
+
+## Password Hashing
+
+For password hashing, we are using `bcryptjs`. If you are using `bcryptjs` for password hashing, make sure to install its types for TypeScript:
+
+```bash
+docker-compose exec app npm install --save-dev @types/bcryptjs
+```
 
 ## Contributing
 
