@@ -1,14 +1,21 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Crear usuarios de prueba
+  const saltRounds = 10;
+
+  // Encriptar contraseñas
+  const password1 = await bcrypt.hash('password1', saltRounds);
+  const password2 = await bcrypt.hash('password2', saltRounds);
+
+  // Crear usuarios de prueba con contraseñas encriptadas
   const user1 = await prisma.user.create({
     data: {
       email: 'user1@example.com',
       username: 'User One',
-      password: 'password1',
+      password: password1,
     },
   });
 
@@ -16,7 +23,7 @@ async function main() {
     data: {
       email: 'user2@example.com',
       username: 'User Two',
-      password: 'password2',
+      password: password2,
     },
   });
 
