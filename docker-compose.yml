@@ -13,7 +13,7 @@ services:
   db:
     image: postgres:13
     environment:
-      POSTGRES_DB: mydatabase
+      POSTGRES_DB: springrolls_bd
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     ports:
