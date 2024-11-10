@@ -1,21 +1,21 @@
 
 # Next Springrolls Site
 
-Una plataforma para que los creadores de contenido consoliden sus enlaces a otras redes o servicios, moneticen su contenido y servicios, y ofrezcan una interfaz donde los seguidores puedan interactuar a través de propinas.
+A platform for content creators to consolidate links to other networks or services, monetize their content and services, and offer an interface where followers can interact through tips.
 
-## Tabla de Contenidos
+## Table of Contents
 
-- [Tecnologías](#tecnologías)
-- [Prerequisitos](#prerequisitos)
-- [Instalación](#instalación)
-- [Uso](#uso)
-- [Migraciones](#migraciones)
-- [Hash de Contraseñas](#hash-de-contraseñas)
-- [Problemas Comunes](#problemas-comunes)
-- [Contribuyendo](#contribuyendo)
-- [Licencia](#licencia)
+- [Technologies](#technologies)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Migrations](#migrations)
+- [Password Hashing](#password-hashing)
+- [Common Issues](#common-issues)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Tecnologías
+## Technologies
 
 - [Next.js](https://nextjs.org/)
 - [TypeScript](https://www.typescriptlang.org/)
@@ -25,200 +25,141 @@ Una plataforma para que los creadores de contenido consoliden sus enlaces a otra
 - [Prisma](https://www.prisma.io/)
 - [Docker](https://www.docker.com/)
 
-## Prerequisitos
+## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
-- Node.js (opcional, si deseas ejecutar la aplicación localmente sin Docker)
+- Node.js (optional, if you want to run the app locally without Docker)
 
-## Instalación
+## Installation
 
-1. **Clonar el repositorio:**
+1. **Clone the repository:**
 
    ```bash
    git clone git@github.com:springrolls-site/next-springrolls.git
    cd next-springrolls
    ```
 
-2. **Crear un archivo `.env` a partir del ejemplo:**
+2. **Create a `.env` file from the example file:**
 
    ```bash
    cp .env.example .env
    ```
 
-   Asegúrate de configurar los valores correctos en tu archivo `.env`, especialmente la variable `DATABASE_URL`.
+   Make sure to set the correct values in your `.env` file, especially the `DATABASE_URL` variable.
 
-3. **Instalar dependencias localmente (opcional pero recomendado):**
+3. **Install dependencies locally (optional but recommended):**
 
    ```bash
    npm install
    ```
 
-   Esto asegura que tu `package.json` y `package-lock.json` estén actualizados.
+   This ensures your `package.json` and `package-lock.json` are up-to-date.
 
-4. **Iniciar los contenedores de Docker:**
+4. **Start the Docker containers:**
 
    ```bash
    docker-compose up -d --build
    ```
 
-   La bandera `--build` asegura que la imagen de Docker se reconstruya, incluyendo cualquier nueva dependencia.
+   The `--build` flag ensures the Docker image is rebuilt to include any new dependencies.
 
-5. **Ejecutar las migraciones iniciales:**
+5. **Run initial migrations:**
 
    ```bash
    docker-compose exec app npx prisma migrate dev --name init
    ```
 
-6. **(Opcional) Ejecutar el script de seed para agregar datos iniciales:**
+6. **(Optional) Run the seed script to add initial data:**
 
    ```bash
    docker-compose exec app npx ts-node seed.ts
    ```
 
-## Uso
+## Usage
 
-Accede a la aplicación en [http://localhost:3000](http://localhost:3000).
+Access the application at [http://localhost:3000](http://localhost:3000).
 
-### Endpoints de la API
+### API Endpoints
 
-- **GET** `/api/users`: Recupera una lista de usuarios.
+- **GET** `/api/users`: Retrieve a list of users.
 
-## Migraciones
+## Migrations
 
-Cuando realices cambios en el esquema de la base de datos:
+When making changes to the database schema:
 
-1. **Modificar el archivo `prisma/schema.prisma`** para reflejar los cambios en el modelo.
+1. **Modify the `prisma/schema.prisma` file** to reflect model changes.
 
-2. **Crear una nueva migración:**
+2. **Create a new migration:**
 
    ```bash
-   docker-compose exec app npx prisma migrate dev --name nombre_de_migracion
+   docker-compose exec app npx prisma migrate dev --name migration_name
    ```
 
-3. **(Opcional) Actualizar los datos de seed ejecutando el script de seed:**
+3. **(Optional) Update seed data by running the seed script:**
 
    ```bash
    docker-compose exec app npx ts-node seed.ts
    ```
 
-## Hash de Contraseñas
+## Password Hashing
 
-Para el hash de contraseñas, estamos utilizando `bcryptjs`. Asegúrate de instalar tanto el paquete como sus definiciones de tipo para TypeScript.
+For password hashing, we use `bcryptjs`. Make sure to install both the package and its type definitions for TypeScript.
 
-### Instalación de `bcryptjs` y sus definiciones de tipo:
+### Installing `bcryptjs` and its type definitions:
 
-1. **Instalar `bcryptjs`:**
+1. **Install `bcryptjs`:**
 
    ```bash
    docker-compose exec app npm install bcryptjs
    ```
 
-2. **Instalar las definiciones de tipo para `bcryptjs`:**
+2. **Install type definitions for `bcryptjs`:**
 
    ```bash
    docker-compose exec app npm install --save-dev @types/bcryptjs
    ```
 
-3. **Reconstruir la imagen de Docker para incluir las nuevas dependencias:**
+3. **Rebuild the Docker image to include new dependencies:**
 
    ```bash
    docker-compose up -d --build
    ```
 
-Esto asegurará que `bcryptjs` esté disponible tanto en tu entorno local como dentro del contenedor Docker.
+This ensures `bcryptjs` is available in both your local and Docker environments.
 
-## Problemas Comunes
+### 🚨 Steps to Follow When Rebuilding Containers 🚨
 
-### Puerto 5432 ya está en uso
+Each time you rebuild your containers, follow these steps to ensure that Prisma, migrations, and database seed data are correctly updated:
 
-Si encuentras un error como:
-
-```
-Error starting userland proxy: listen tcp4 0.0.0.0:5432: bind: address already in use
-```
-
-Esto significa que el puerto predeterminado de PostgreSQL `5432` ya está en uso en tu máquina.
-
-#### Opciones de Solución:
-
-1. **Detener el servicio local de PostgreSQL:**
-
-   - **macOS con Homebrew:**
-
-     ```bash
-     brew services stop postgresql
-     ```
-
-   - **Ubuntu/Debian:**
-
-     ```bash
-     sudo service postgresql stop
-     ```
-
-   - **Windows:**
-
-     - Detén el servicio de PostgreSQL desde la consola de servicios (`services.msc`).
-
-2. **Cambiar el mapeo de puertos en `docker-compose.yml`:**
-
-   Actualiza el servicio `db` para mapear a un puerto diferente, por ejemplo, `5433`:
-
-   ```yaml
-   services:
-     db:
-       image: postgres:13
-       ports:
-         - '5433:5432'
-       # ... resto de la configuración
-   ```
-
-   Luego, actualiza tu archivo `.env` o la configuración de la base de datos para usar el nuevo puerto:
-
-   ```env
-   DATABASE_URL=postgresql://postgres:password@localhost:5433/mydb
-   ```
-
-### Error "Cannot find module 'bcryptjs'"
-
-Si encuentras un error como:
-
-```
-Error: Cannot find module 'bcryptjs'
-```
-
-Asegúrate de que `bcryptjs` esté instalado correctamente en tu proyecto.
-
-#### Solución:
-
-1. **Instalar `bcryptjs`:**
-
+1. **Run Prisma migrations**  
    ```bash
-   docker-compose exec app npm install bcryptjs
+   docker-compose exec app npx prisma migrate dev
    ```
 
-2. **Instalar las definiciones de tipo para TypeScript:**
-
+2. **Install development dependencies (if new ones have been added)**  
    ```bash
    docker-compose exec app npm install --save-dev @types/bcryptjs
    ```
 
-3. **Reconstruir la imagen de Docker:**
-
-   ```bash
-   docker-compose up -d --build
-   ```
-
-4. **Ejecutar nuevamente el script de seed:**
-
+3. **Load seed data**  
    ```bash
    docker-compose exec app npx ts-node seed.ts
    ```
 
-## Contribuyendo
+4. **Generate Prisma client**  
+   ```bash
+   docker-compose exec app npx prisma generate
+   ```
 
-Las contribuciones son bienvenidas. Por favor, abre un issue o una pull request.
+5. **Restart the app container**  
+   ```bash
+   docker-compose restart app
+   ```
 
-## Licencia
+### Note
+Each step is necessary to ensure that all changes to the database schema and dependencies are synchronized within the app container.
 
-Este proyecto está licenciado bajo la Licencia MIT.
+## License
+
+This project is licensed under the MIT License.
