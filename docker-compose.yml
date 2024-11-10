@@ -7,6 +7,9 @@ services:
       - "3000:3000"
     env_file:
       - .env
+    volumes:
+      - .:/app  # Monta el código fuente local en el contenedor
+      - /app/node_modules
     depends_on:
       - db
 
