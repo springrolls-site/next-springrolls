@@ -48,6 +48,18 @@ A platform for content creators to consolidate links to other networks or servic
 
    Make sure to set the correct values in your `.env` file, especially the `DATABASE_URL` variable.
 
+   Use the following command to generate a random 32-character key:
+
+   ```
+   openssl rand -base64 32
+   ```
+
+   Set NEXTAUTH_SECRET in the .env file:
+
+   ```
+   NEXTAUTH_SECRET="your-generated-secret-key"
+   ```
+
 3. **Install dependencies locally (optional but recommended):**
 
    ```bash
