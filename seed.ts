@@ -10,12 +10,24 @@ async function main() {
   const password1 = await bcrypt.hash('password1', saltRounds);
   const password2 = await bcrypt.hash('password2', saltRounds);
 
-  // Crear usuarios de prueba con contraseñas encriptadas
+  // Obtener o crear el rol PREMIUM
+  const premiumRole = await prisma.role.upsert({
+    where: { name: 'PREMIUM' },
+    update: {},
+    create: {
+      name: 'PREMIUM',
+    },
+  });
+
+  // Crear usuarios de prueba con contraseñas encriptadas y asignarles roles
   const user1 = await prisma.user.create({
     data: {
-      email: 'user1@example.com',
+      email: 'pino.jose@gmail.com',
       username: 'User One',
       password: password1,
+      roles: {
+        create: [{ roleId: premiumRole.id }],
+      },
     },
   });
 

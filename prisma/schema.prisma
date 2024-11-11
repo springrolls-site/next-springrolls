@@ -1,8 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// prisma/schema.prisma
 
 generator client {
   provider = "prisma-client-js"
@@ -14,11 +10,72 @@ datasource db {
 }
 
 model User {
-  id        Int     @id @default(autoincrement())
-  username  String  @unique
-  email     String  @unique
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  email     String    @unique
   password  String
+  roles     UserRole[] // Adjusted to use the `UserRole` model for many-to-many relationship
+  profile   Profile?   // Relation to the profile model
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
+model Profile {
+  id              Int          @id @default(autoincrement())
+  user            User         @relation(fields: [userId], references: [id])
+  userId          Int          @unique // Added unique constraint
+  name            String       // Name of the content creator
+  bio             String?      // Bio of the user
+  profileImageUrl String?      // URL to the profile image (e.g., in a bucket)
+  backgroundImageUrl String?   // URL to the background image
 
+  links           Link[]       // Relation to custom links
+  socialMedia     SocialMedia? // Relation to social media links
 
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+model Link {
+  id         Int      @id @default(autoincrement())
+  profile    Profile  @relation(fields: [profileId], references: [id])
+  profileId  Int
+  name       String   // Display name of the link
+  url        String   // URL of the link
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model SocialMedia {
+  id             Int      @id @default(autoincrement())
+  profile        Profile  @relation(fields: [profileId], references: [id])
+  profileId      Int      @unique // Added unique constraint
+  instagramUrl   String?  // Optional link to Instagram
+  twitterUrl     String?  // Optional link to Twitter
+  tiktokUrl      String?  // Optional link to TikTok
+  telegramUrl    String?  // Optional link to Telegram
+  snapchatUrl    String?  // Optional link to Snapchat
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// Many-to-many relationship table
+model UserRole {
+  userId Int
+  roleId Int
+  user   User @relation(fields: [userId], references: [id])
+  role   Role @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId]) // Composite primary key
+}
+
+model Role {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  users    UserRole[]  // Adjusted to use the `UserRole` model for many-to-many relationship
+
+  createdAt DateTime @default(now())
+}
