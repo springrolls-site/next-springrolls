@@ -1,4 +1,3 @@
-// pages/chinessecook/index.tsx
 import { useSession } from "next-auth/react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { useForm } from "react-hook-form";
@@ -7,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
 import {
   Form,
   FormField,
@@ -27,6 +28,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const { data: session } = useSession({
     required: true,
     onUnauthenticated() {
@@ -36,7 +38,6 @@ const Dashboard = () => {
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<File | null>(null);
 
-  // Initialize form with react-hook-form and zodResolver
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -45,7 +46,6 @@ const Dashboard = () => {
     },
   });
 
-  // Fetch profile data and populate form if data exists
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -67,9 +67,9 @@ const Dashboard = () => {
     fetchProfile();
   }, [form]);
 
-  // Handle form submission
   const onSubmit = async (values: ProfileFormValues) => {
     setLoading(true);
+    setAlert(null);
     try {
       const formData = new FormData();
       formData.append("name", values.name);
@@ -84,13 +84,13 @@ const Dashboard = () => {
       });
 
       if (response.ok) {
-        alert("Profile updated successfully!");
+        setAlert({ type: "success", message: "Profile updated successfully!" });
       } else {
-        alert("Failed to update profile. Please try again.");
+        setAlert({ type: "error", message: "Failed to update profile. Please try again." });
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Failed to update profile. Please try again.");
+      setAlert({ type: "error", message: "Failed to update profile. Please try again." });
     } finally {
       setLoading(false);
     }
@@ -101,6 +101,15 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       <h1 className="text-3xl font-bold">Edit Profile</h1>
+      
+      {alert && (
+        <Alert className="mb-4" style={{ borderColor: alert.type === "success" ? "green" : "red" }}>
+          <Terminal className="h-4 w-4" />
+          <AlertTitle>{alert.type === "success" ? "Success" : "Error"}</AlertTitle>
+          <AlertDescription>{alert.message}</AlertDescription>
+        </Alert>
+      )}
+      
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
