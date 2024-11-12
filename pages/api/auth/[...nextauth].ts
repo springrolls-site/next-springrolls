@@ -28,8 +28,8 @@ export default NextAuth({
     }),
   ],
   callbacks: {
-    async session({ session, user }) {
-      session.user = user;
+    async session({ session, token }) {
+      session.user.id = token.id;  
       return session;
     },
     async jwt({ token, user }) {
