@@ -18,8 +18,15 @@ import {
 } from "@/components/ui/form";
 import { useState, useEffect } from "react";
 
-// Zod schema for validation
+// Zod schema for validation, including `username`
 const profileSchema = z.object({
+  username: z
+    .string()
+    .min(2, "Username is required")
+    .regex(
+      /^[a-zA-Z0-9_-]+$/,
+      "Username can only contain letters, numbers, hyphens, and underscores"
+    ),
   name: z.string().min(2, "Name is required"),
   bio: z.string().max(500, "Bio can't exceed 500 characters").optional(),
 });
@@ -41,6 +48,7 @@ const Dashboard = () => {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
+      username: "",
       name: "",
       bio: "",
     },
@@ -54,6 +62,7 @@ const Dashboard = () => {
           const data = await response.json();
           if (data) {
             form.reset({
+              username: data.username || "",
               name: data.name || "",
               bio: data.bio || "",
             });
@@ -72,6 +81,7 @@ const Dashboard = () => {
     setAlert(null);
     try {
       const formData = new FormData();
+      formData.append("username", values.username);
       formData.append("name", values.name);
       formData.append("bio", values.bio || "");
 
@@ -112,6 +122,19 @@ const Dashboard = () => {
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input placeholder="Your username" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="name"

@@ -37,6 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ error: "Error parsing form data" });
     }
 
+    const username = fields.username ? fields.username[0] : "";
     const name = fields.name ? fields.name[0] : "";
     const bio = fields.bio ? fields.bio[0] : "";
 
@@ -47,7 +48,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const backgroundImageUrl = backgroundImageFile ? `/uploads/${path.basename(backgroundImageFile.path)}` : undefined;
 
     try {
-      // Fetch the current profile to get existing image URLs
       const existingProfile = await prisma.profile.findUnique({
         where: { userId: session.user.id },
       });
@@ -67,6 +67,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           profileImageUrl: profileImageUrl || "",
           backgroundImageUrl: backgroundImageUrl || "",
         },
+      });
+
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: { username },
       });
 
       res.status(200).json({
