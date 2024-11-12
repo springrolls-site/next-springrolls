@@ -154,14 +154,14 @@ Each time you rebuild your containers, follow these steps to ensure that Prisma,
    docker-compose exec app npm install --save-dev @types/bcryptjs
    ```
 
-3. **Load seed data**  
-   ```bash
-   docker-compose exec app npx ts-node seed.ts
-   ```
-
-4. **Generate Prisma client**  
+3. **Generate Prisma client**  
    ```bash
    docker-compose exec app npx prisma generate
+   ```
+
+4. **Load seed data**  
+   ```bash
+   docker-compose exec app npx ts-node seed.ts
    ```
 
 5. **Restart the app container**  
