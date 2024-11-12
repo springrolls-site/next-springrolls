@@ -29,7 +29,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  // Use multiparty to handle the form data and file uploads
   const form = new multiparty.Form({ uploadDir });
 
   form.parse(req, async (err, fields, files) => {
@@ -38,35 +37,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ error: "Error parsing form data" });
     }
 
-    // Extract text fields
     const name = fields.name ? fields.name[0] : "";
     const bio = fields.bio ? fields.bio[0] : "";
 
-    // Process uploaded files
     const profileImageFile = files.profileImage ? files.profileImage[0] : null;
     const backgroundImageFile = files.backgroundImage ? files.backgroundImage[0] : null;
 
-    const profileImageUrl = profileImageFile ? `/uploads/${path.basename(profileImageFile.path)}` : null;
-    const backgroundImageUrl = backgroundImageFile ? `/uploads/${path.basename(backgroundImageFile.path)}` : null;
-
-    console.log("Profile Image URL:", profileImageUrl);
-    console.log("Background Image URL:", backgroundImageUrl);
+    const profileImageUrl = profileImageFile ? `/uploads/${path.basename(profileImageFile.path)}` : undefined;
+    const backgroundImageUrl = backgroundImageFile ? `/uploads/${path.basename(backgroundImageFile.path)}` : undefined;
 
     try {
+      // Fetch the current profile to get existing image URLs
+      const existingProfile = await prisma.profile.findUnique({
+        where: { userId: session.user.id },
+      });
+
       const updatedProfile = await prisma.profile.upsert({
         where: { userId: session.user.id },
         update: {
           name,
           bio,
-          profileImageUrl,
-          backgroundImageUrl,
+          profileImageUrl: profileImageUrl || existingProfile?.profileImageUrl,
+          backgroundImageUrl: backgroundImageUrl || existingProfile?.backgroundImageUrl,
         },
         create: {
           userId: session.user.id,
           name,
           bio,
-          profileImageUrl,
-          backgroundImageUrl,
+          profileImageUrl: profileImageUrl || "",
+          backgroundImageUrl: backgroundImageUrl || "",
         },
       });
 
