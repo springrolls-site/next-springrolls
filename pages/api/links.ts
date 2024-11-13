@@ -1,5 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
+import { LinkStateType } from "../manage-links";
+import { getSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import authOption from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
@@ -7,18 +11,23 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { id, name, url, temp } = await req.body;
+  const { id, links } = await req.body;
 
-  console.log("METHOD: ", req.method);
-  console.log("TEMP: ", temp);
+  const session = await getServerSession(req, res, authOption);
 
   if (req.method === "POST") {
-    console.log("inside");
-    temp.map(async (value: any, index: any) => {
+    await prisma.link.create({
+      data: {
+        name: "",
+        url: "",
+        profileId: session.user.id,
+      },
+    });
+    return res.json({ msg: "Field Create successful!" });
+  } else if (req.method === "PUT") {
+    links.map(async (value: LinkStateType, index: Number) => {
       const response = await prisma.link.updateMany({
         where: {
-          // @ts-ignore
-          // profileId: session.user.id,
           id: value.id,
         },
         data: {
@@ -26,21 +35,24 @@ export default async function handler(
           url: value.url,
         },
       });
-      console.log("RESPONSEFORPUT: ", response);
+      return res.json({ msg: "Update successful!" });
     });
   } else if (req.method === "GET") {
     const response = await prisma.link.findMany({
       where: {
-        // @ts-ignore
-        profileId: 1,
+        profileId: session?.user?.id,
+      },
+      select: {
+        id: true,
+        name: true,
+        url: true,
       },
     });
-    console.log("BACKENDRESPONSE: ", response);
     return res.json(response);
   } else if (req.method === "DELETE") {
     const response = await prisma.profile.update({
       where: {
-        id: 1,
+        id: session?.user?.id,
       },
       data: {
         links: {
@@ -50,5 +62,6 @@ export default async function handler(
         },
       },
     });
+    return res.json({ msg: "Delete successful!" });
   }
 }

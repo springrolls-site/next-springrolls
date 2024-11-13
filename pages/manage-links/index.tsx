@@ -6,59 +6,59 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-interface LinkStateType {
+export interface LinkStateType {
   id: number;
   name: string;
   url: string;
 }
 
 const Page = () => {
-  const [temp, setTemp] = useState<LinkStateType[]>([]);
+  const [links, setLinks] = useState<LinkStateType[]>([]);
 
-  // Fetch the existing links on component mount
-  const trying = async () => {
+  const [userId, setUserId] = useState();
+
+  const fetchData = async () => {
     const response = await axios.get("/api/links");
-    console.log("Frontend: ", response.data);
-    console.log("LENGTH: ", response.data.length);
-    for (let i in response.data) {
-      setTemp((prev) => [
-        ...prev,
-        {
-          id: response.data[i].id,
-          name: response.data[i].name,
-          url: response.data[i].url,
-        },
-      ]);
-    }
+    setLinks(response.data);
   };
 
   useEffect(() => {
-    trying();
+    fetchData();
   }, []);
 
+  const handleAdd = async () => {
+    // setLinks((prev) => [...prev, { name: "", url: ""}])
+    const response = await axios.post("/api/links");
+    fetchData();
+  };
+
   const handleUpdate = async () => {
-    const response = await axios.post("/api/links", { temp });
+    const response = await axios.put("/api/links", { links });
+    fetchData();
   };
 
   const handleDelete = async (id: number) => {
     const response = await axios.delete("/api/links", { data: { id: id } });
-    
+    fetchData();
   };
 
+  const handleCancel = () => {
+    fetchData();
+  };
   const handleChange = (
     index: number,
     field: "name" | "url",
     value: string
   ) => {
-    const updatedLinks = [...temp];
+    const updatedLinks = [...links];
     updatedLinks[index] = { ...updatedLinks[index], [field]: value };
-    setTemp(updatedLinks);
+    setLinks(updatedLinks);
   };
 
   return (
     <>
       <DashboardLayout>
-        {JSON.stringify(temp)}
+        {JSON.stringify(links)}
         <div className="border border-black w-full">
           <Tabs defaultValue="links" className="px-10 py-10">
             <TabsList>
@@ -67,8 +67,8 @@ const Page = () => {
             </TabsList>
 
             <TabsContent value="links">
-              <div className="">
-                {temp.map((value, index) => (
+              <div className="w-[50%]">
+                {links.map((value, index) => (
                   <div
                     key={index}
                     className="flex gap-5 w-full border border-black"
@@ -89,27 +89,29 @@ const Page = () => {
 
                     <div>
                       <Label htmlFor={`link-url-${index}`}>Link URL</Label>
-                      <Input
-                        type="text"
-                        id={`link-url-${index}`}
-                        value={value.url}
-                        onChange={(e) =>
-                          handleChange(index, "url", e.target.value)
-                        }
-                        autoComplete="off"
-                        placeholder="https://www.instagram.com/"
-                      />
-                      <Button onClick={() => handleDelete(value.id)}>
-                        Delete
-                      </Button>
+                      <div className="flex items-center gap-5">
+                        <Input
+                          type="text"
+                          id={`link-url-${index}`}
+                          value={value.url}
+                          onChange={(e) =>
+                            handleChange(index, "url", e.target.value)
+                          }
+                          autoComplete="off"
+                          placeholder="https://www.instagram.com/"
+                        />
+                        <Button onClick={() => handleDelete(value.id)}>
+                          Delete
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ))}
 
                 <div className="flex justify-between">
-                  <Button>Add link</Button>
+                  <Button onClick={handleAdd}>Add link</Button>
                   <div className="flex gap-2">
-                    <Button>Cancel</Button>
+                    <Button onClick={handleCancel}>Cancel</Button>
                     <Button onClick={handleUpdate}>Update</Button>
                   </div>
                 </div>
