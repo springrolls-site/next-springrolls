@@ -65,6 +65,10 @@ export default async function handler(
         twitterUrl: true,
         youtubeUrl: true,
       },
+      orderBy: {
+        createdAt: "asc"
+      }
+
     });
     return res.json(response);
   }

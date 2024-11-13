@@ -6,14 +6,9 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import SocialLinks from "@/components/SocialLinks";
+import { useToast } from "@/hooks/use-toast";
 
 export interface LinkStateType {
-  id: number;
-  name: string;
-  url: string;
-}
-
-export interface SocialStateType {
   id: number;
   name: string;
   url: string;
@@ -22,7 +17,7 @@ export interface SocialStateType {
 const ManageLinks = () => {
   const [links, setLinks] = useState<LinkStateType[]>([]);
 
-  const [social, setSocial] = useState<SocialStateType[]>([]);
+  const { toast } = useToast();
 
   const fetchData = async () => {
     const response = await axios.get("/api/links");
@@ -41,11 +36,27 @@ const ManageLinks = () => {
 
   const handleUpdate = async () => {
     const response = await axios.put("/api/links", { links });
-    fetchData();
+    if (response.data.msg === "Update successful!") {
+      toast({
+        title: "Update successful!",
+      });
+    }
+
+    new Promise(() => {
+      setTimeout(() => {
+        fetchData();
+      }, 1000);
+    });
   };
 
   const handleDelete = async (id: number) => {
     const response = await axios.delete("/api/links", { data: { id: id } });
+
+    if (response.data.msg === "Delete successful!") {
+      toast({
+        title: "Delete successful!",
+      });
+    }
     fetchData();
   };
 
@@ -65,8 +76,7 @@ const ManageLinks = () => {
   return (
     <>
       <DashboardLayout>
-        {JSON.stringify(links)}
-        <div className="border border-black w-full">
+        <div className="w-full">
           <Tabs defaultValue="links" className="px-10 py-10">
             <TabsList>
               <TabsTrigger value="links">Links</TabsTrigger>
@@ -76,10 +86,7 @@ const ManageLinks = () => {
             <TabsContent value="links">
               <div className="w-[50%]">
                 {links.map((value, index) => (
-                  <div
-                    key={index}
-                    className="flex gap-5 w-full border border-black"
-                  >
+                  <div key={index} className="grid grid-cols-2 gap-5 pb-5">
                     <div>
                       <Label htmlFor={`link-name-${index}`}>Link name</Label>
                       <Input
@@ -126,38 +133,6 @@ const ManageLinks = () => {
             </TabsContent>
             <TabsContent value="social">
               <SocialLinks />
-              {/* <div className="grid grid-cols-2 gap-5 w-2/4">
-                <div>
-                  <Label htmlFor={``}>Instagram</Label>
-                  <Input placeholder="" />
-                </div>
-
-                <div>
-                  <Label htmlFor={``}>Tiktok</Label>
-                  <Input placeholder="" />
-                </div>
-
-                <div>
-                  <Label htmlFor={``}>Twitter</Label>
-                  <Input placeholder="" />
-                </div>
-
-                <div>
-                  <Label htmlFor={``}>Snapchat</Label>
-                  <Input placeholder="" />
-                </div>
-
-                <div>
-                  <Label htmlFor={``}>Telegram</Label>
-                  <Input placeholder="" />
-                </div>
-
-                <div>
-                  <Label htmlFor={``}>Youtube</Label>
-                  <Input placeholder="" />
-                </div>
-              </div>
-              <Button onClick={handleUpdate}>Update</Button> */}
             </TabsContent>
           </Tabs>
         </div>

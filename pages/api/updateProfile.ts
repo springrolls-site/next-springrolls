@@ -79,7 +79,31 @@ export default async function handler(
           backgroundImageUrl: backgroundImageUrl || "",
         },
       });
-      
+
+      // Create 4 social tabs
+      await prisma.socialMedia.create({
+        data: {
+          profileId: session?.user.id,
+          instagramUrl: "",
+          snapchatUrl: "",
+          telegramUrl: "",
+          tiktokUrl: "",
+          twitterUrl: "",
+          youtubeUrl: "",
+        },
+      });
+
+      // Create 4 link tab
+      for (let i = 0; i < 4; i++) {
+        await prisma.link.create({
+          data: {
+            profileId: session.user.id,
+            name: "",
+            url: "",
+          },
+        });
+      }
+
       await prisma.user.update({
         where: { id: session.user.id },
         data: { username },

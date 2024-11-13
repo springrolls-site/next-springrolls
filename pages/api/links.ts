@@ -46,6 +46,9 @@ export default async function handler(
         name: true,
         url: true,
       },
+      orderBy: {
+        createdAt: "asc",
+      },
     });
     return res.json(response);
   } else if (req.method === "DELETE") {
