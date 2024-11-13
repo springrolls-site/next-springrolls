@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
-import { LinkStateType } from "../manage-links";
-import { getSession } from "next-auth/react";
+import { LinkStateType } from "../manage-links/ManageLinks";
 import { getServerSession } from "next-auth";
 import authOption from "@/lib/auth";
 
@@ -18,9 +17,9 @@ export default async function handler(
   if (req.method === "POST") {
     await prisma.link.create({
       data: {
+        profileId: session.user.id,
         name: "",
         url: "",
-        profileId: session.user.id,
       },
     });
     return res.json({ msg: "Field Create successful!" });

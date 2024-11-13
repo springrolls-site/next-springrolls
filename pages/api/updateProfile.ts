@@ -79,7 +79,7 @@ export default async function handler(
           backgroundImageUrl: backgroundImageUrl || "",
         },
       });
-
+      
       await prisma.user.update({
         where: { id: session.user.id },
         data: { username },

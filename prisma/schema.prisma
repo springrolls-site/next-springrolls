@@ -53,11 +53,12 @@ model SocialMedia {
   id           Int     @id @default(autoincrement())
   profile      Profile @relation(fields: [profileId], references: [id])
   profileId    Int     @unique // Added unique constraint
-  instagramUrl String? // Optional link to Instagram
-  twitterUrl   String? // Optional link to Twitter
-  tiktokUrl    String? // Optional link to TikTok
-  telegramUrl  String? // Optional link to Telegram
-  snapchatUrl  String? // Optional link to Snapchat
+  instagramUrl String
+  twitterUrl   String
+  tiktokUrl    String
+  telegramUrl  String
+  snapchatUrl  String
+  youtubeUrl   String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
