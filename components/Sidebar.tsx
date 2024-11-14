@@ -14,7 +14,7 @@ import { signOut } from "next-auth/react"; // Importa signOut
 // Definimos los elementos del menú
 const items = [
   { title: "Home", url: "/chinessecook", icon: Home },
-  { title: "Inbox", url: "#", icon: Inbox },
+  { title: "Links", url: "/manage-links", icon: Inbox },
   { title: "Calendar", url: "#", icon: Calendar },
   { title: "Search", url: "#", icon: Search },
   { title: "Settings", url: "#", icon: Settings },
@@ -40,7 +40,10 @@ export function AppSidebar() {
               ))}
               {/* Botón de Logout */}
               <SidebarMenuItem>
-                <SidebarMenuButton asChild onClick={() => signOut({ callbackUrl: "/login" })}>
+                <SidebarMenuButton
+                  asChild
+                  onClick={() => signOut({ callbackUrl: "/login" })}
+                >
                   <button className="flex items-center w-full">
                     <LogOut />
                     <span>Logout</span>
