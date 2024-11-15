@@ -6,6 +6,7 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+import { PacmanLoader, PropagateLoader } from "react-spinners";
 
 const ManageLinks = () => {
   return (
@@ -42,10 +43,15 @@ export interface LinkStateType {
 
 const CustomLinks = () => {
   const [links, setLinks] = useState<LinkStateType[]>([]);
-
+  const [loading, setLoading] = useState<boolean>(true);
   const { toast } = useToast();
 
   const fetchData = async () => {
+    new Promise(() => {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+    });
     const response = await axios.get("/api/links");
     setLinks(response.data);
   };
@@ -101,46 +107,52 @@ const CustomLinks = () => {
 
   return (
     <>
-      <div className="w-[50%]">
-        {links.map((value, index) => (
-          <div key={index} className="grid grid-cols-2 gap-5 pb-5">
-            <div>
-              <Label htmlFor={`link-name-${index}`}>Link name</Label>
-              <Input
-                type="text"
-                id={`link-name-${index}`}
-                value={value.name}
-                onChange={(e) => handleChange(index, "name", e.target.value)}
-                autoComplete="off"
-                placeholder="Exclusive Content"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor={`link-url-${index}`}>Link URL</Label>
-              <div className="flex items-center gap-5">
+      {loading ? (
+        <div className="flex justify-center items-center">
+          <PropagateLoader size={20} />
+        </div>
+      ) : (
+        <div className="w-[50%]">
+          {links.map((value, index) => (
+            <div key={index} className="grid grid-cols-2 gap-5 pb-5">
+              <div>
+                <Label htmlFor={`link-name-${index}`}>Link name</Label>
                 <Input
                   type="text"
-                  id={`link-url-${index}`}
-                  value={value.url}
-                  onChange={(e) => handleChange(index, "url", e.target.value)}
+                  id={`link-name-${index}`}
+                  value={value.name}
+                  onChange={(e) => handleChange(index, "name", e.target.value)}
                   autoComplete="off"
-                  placeholder="https://www.instagram.com/"
+                  placeholder="Exclusive Content"
                 />
-                <Button onClick={() => handleDelete(value.id)}>Delete</Button>
+              </div>
+
+              <div>
+                <Label htmlFor={`link-url-${index}`}>Link URL</Label>
+                <div className="flex items-center gap-5">
+                  <Input
+                    type="text"
+                    id={`link-url-${index}`}
+                    value={value.url}
+                    onChange={(e) => handleChange(index, "url", e.target.value)}
+                    autoComplete="off"
+                    placeholder="https://www.instagram.com/"
+                  />
+                  <Button onClick={() => handleDelete(value.id)}>Delete</Button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        <div className="flex justify-between">
-          <Button onClick={handleAdd}>Add link</Button>
-          <div className="flex gap-2">
-            <Button onClick={handleCancel}>Cancel</Button>
-            <Button onClick={handleUpdate}>Update</Button>
+          <div className="flex justify-between">
+            <Button onClick={handleAdd}>Add link</Button>
+            <div className="flex gap-2">
+              <Button onClick={handleCancel}>Cancel</Button>
+              <Button onClick={handleUpdate}>Update</Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 };
@@ -204,7 +216,7 @@ const SocialLinks = () => {
 
   return (
     <>
-      <div className=" w-2/4 ">
+      <div className="w-2/4 ">
         {social.length > 0 && (
           <div className="grid grid-cols-2 gap-5  pb-5">
             <div>
