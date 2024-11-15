@@ -8,8 +8,8 @@ services:
     env_file:
       - .env
     volumes:
-      - .:/app  # Monta el código fuente local en el contenedor
-      - /app/node_modules
+      - .:/app                 # Monta tu código fuente local
+      - app_node_modules:/app/node_modules  # Volumen persistente para node_modules
     depends_on:
       - db
 
@@ -26,3 +26,4 @@ services:
 
 volumes:
   postgres_data:
+  app_node_modules: # Volumen persistente para node_modules
