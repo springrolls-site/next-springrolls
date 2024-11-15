@@ -4,7 +4,7 @@ FROM node:18
 # Configura el directorio de trabajo
 WORKDIR /app
 
-# Copia el package.json y package-lock.json
+# Copia los archivos necesarios para instalar dependencias
 COPY package*.json ./
 
 # Instala las dependencias
